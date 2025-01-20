@@ -1,0 +1,28 @@
+execute playbooks
+- - - - - - - - - - -
+#dev deployment apim with vault
+ansible-playbook -i inventory/dev site.yml --limit "apim01" -e "@vars.json" --vault-password-file ../pwds/dev.txt
+ansible-playbook -i inventory/dev site.yml --limit "apim01 apim02 gateway01 gateway02" -e "@vars.json" --vault-password-file ../pwds/dev.txt
+
+
+
+
+
+
+
+ansible-playbook -i inventory/dev site.yml --limit "apim42" -e "@vars.json" --vault-password-file ../pwds/dev.txt
+
+
+ansible-playbook -i inventory/dev site.yml --limit "apim01" -e "@vars.json" --vault-password-file ../pwds/dev.txt
+
+ansible-playbook -i inventory/dev site.yml --limit "apim02" -e "@vars.json" --vault-password-file ../pwds/dev.txt
+
+#dev deployment apim (only configuration) with vault
+ansible-playbook -i inventory/dev site.yml --skip-tags "update_java, update_wso2" --limit "apim" -e "@vars.json" --vault-password-file ../pwds/dev.txt
+
+#dev deployment apim-gateway (only configuration) with vault
+ansible-playbook -i inventory/dev site.yml --skip-tags "update_java, update_wso2" --limit "apim-gateway" -e "@vars.json" --vault-password-file ../pwds/dev.txt
+
+
+
+ansible-playbook -i inventory/dev access.yml --limit "apim01" -e "@vars.json" --vault-password-file ../pwds/dev.txt

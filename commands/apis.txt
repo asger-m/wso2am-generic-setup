@@ -1,0 +1,1 @@
+https://mg.docs.wso2.com/en/latest/how-tos/security/api-authentication/disabling-security/

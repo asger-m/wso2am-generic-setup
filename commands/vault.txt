@@ -1,0 +1,9 @@
+create vault
+- - - - - - - - -
+#create txt file holding password in ../../pwds/dev.txt
+ansible-vault create --vault-password-file ../../pwds/dev.txt ./inventory/dev/group_vars/all/secrets.yml
+
+
+edit vault
+- - - - - - - - -
+ansible-vault edit --vault-password-file ../../pwds/dev.txt ./inventory/dev/group_vars/all/secrets.yml
