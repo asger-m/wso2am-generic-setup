@@ -24,8 +24,9 @@ hs_err_pid*
 # Auto-generated .retry files
 *.retry
 
-ansible-apim/files/jdk/*.*
-ansible-apim/packs/*.*
-logs/*.*
-pwds/*.*
+ansible-apim/files/jdk/
+ansible-apim/files/packs/
+ansible-apim/files/security/
+logs/
+pwds/
 
