@@ -1,0 +1,146 @@
+# Runtime environment
+runtime_environment: prod
+
+# Default hostname to current ansible_host
+hostname: "{{ ansible_host }}"
+
+# Publisher/Devportal
+ps1: prod-api01.api.jysk.netic.dk
+# Analytics Worker
+aw1: prod-api02.api.jysk.netic.dk
+# Analytics Dashboard
+ad1: prod-api02.api.jysk.netic.dk
+# Traffic Managers
+tm1: prod-api03.api.jysk.netic.dk
+tm2: prod-api04.api.jysk.netic.dk
+# Internal Gateways
+gw1: prod-api05.api.jysk.netic.dk
+gw2: prod-api06.api.jysk.netic.dk
+# Key Managers
+km1: prod-api07.api.jysk.netic.dk
+km2: prod-api08.api.jysk.netic.dk
+# External Gateways
+gw3: prod-api09.api.jysk.netic.dk
+gw4: prod-api10.api.jysk.netic.dk
+
+# Load balanced addresses
+lb_gw: prod.api.jysk.com
+lb_km_services: km.api.jysk.com
+lb_apps: apps.api.jysk.com
+lb_dashboard: dashboard.api.jysk.com
+
+# Database cluster address
+dbcluster: prod-dblb-api.api.jysk.netic.dk
+
+# OS user/group
+wso2_group: wso2serviceuser
+wso2_user: wso2serviceuser
+
+# Active Directory server
+ad_server: "ldaps://emeadkhovdc03.jysk.com:636"
+ad_username: "CN=sa_apimanager,OU=Service Accounts,OU=Administration,DC=jysk,DC=com"
+# ad_password: secrets.yml
+
+# WSO2
+product_version: 3.2.0
+# Current API Manager WUM version to deploy
+apim_wum_version: 1605108146035
+# Current API Manager Analytics WUM version to deploy
+analytics_wum_version: 1605108082038
+
+# User manager configurations
+admin_username: admin
+#admin_password: secrets.yml
+keymanager_username: admin
+#keymanager_password: secrets.yml
+
+# Destination directories
+dest_root_dir: /data
+dest_wso2_dir: "{{ dest_root_dir }}/wso2"
+dest_wso2_logs_dir: "{{ dest_wso2_dir }}/logs32"
+dest_misc_dir: "{{ dest_root_dir }}/misc"
+dest_sync_dir: "{{ dest_wso2_dir }}/sync"
+dest_backup_dir: /tmp
+
+# Source directories
+src_files_dir: files
+src_dropins_dir: "{{ src_files_dir }}/dropins"
+src_jdk_dir: "{{ src_files_dir }}/jdk"
+src_lib_dir: "{{ src_files_dir }}/lib"
+src_misc_dir: "{{ src_files_dir }}/misc"
+src_packs_dir: "{{ src_files_dir }}/packs"
+src_security_dir: "{{ src_files_dir }}/security"
+src_jysk_templates_dir: "{{ src_files_dir }}/jysk/templates"
+src_jysk_files_dir: "{{ src_files_dir }}/jysk/files"
+
+# WUM packs
+src_apim_wum_pack: /data/wso2/.wum3/products/wso2am/{{ product_version }}/full/wso2am-{{ product_version }}+{{ apim_wum_version }}.full.zip
+src_analytics_wum_pack: /data/wso2/.wum3/products/wso2am-analytics/{{ product_version }}/full/wso2am-analytics-{{ product_version }}+{{ analytics_wum_version }}.full.zip
+
+# Set the location the product packages should reside in (eg: "local" in the /files directory, "remote" in a remote location)
+pack_location: local
+#pack_location: remote
+#remote_jdk: "<URL_TO_JDK_FILE>"
+#remote_pack: "<URL_TO_APIM_ANALYTICS_PACK>"
+
+# JDK Distribution
+jdk_name: amazon-corretto-8.275.01.1-linux-x64
+jdk_packname: "{{ jdk_name }}.tar.gz"
+java_dir: /opt
+java_symlink: "{{ java_dir }}/java"
+java_home: "{{ java_dir }}/{{ jdk_name }}"
+
+# JDBC Driver
+jdbc_driver: mysql-connector-java-8.0.22.jar
+
+# Database configuration
+wso2am_db_type: mysql
+wso2am_db_url: jdbc:mysql://{{ dbcluster }}:3306/apim_db32
+wso2am_db_params: autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=Europe/Copenhagen
+wso2am_db_params_encoded: autoReconnect=true&amp;useSSL=false&amp;useLegacyDatetimeCode=false&amp;serverTimezone=Europe/Copenhagen
+wso2am_db_username: apimadmin
+#wso2am_db_password: secrets.yml
+wso2am_db_driver: com.mysql.jdbc.Driver
+wso2am_db_test_query: SELECT 1
+
+wso2shared_db_type: mysql
+wso2shared_db_url: jdbc:mysql://{{ dbcluster }}:3306/shared_db32
+wso2shared_db_params: autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=Europe/Copenhagen
+wso2shared_db_params_encoded: autoReconnect=true&amp;useSSL=false&amp;useLegacyDatetimeCode=false&amp;serverTimezone=Europe/Copenhagen
+wso2shared_db_username: sharedadmin
+#wso2shared_db_password: secrets.yml
+
+#*****jysk-api-manager-extension.xml.j2 - end******
+jysk_nwgw_saml2_issuer: wso2apim_p
+jysk_nwgw_saml2_audience_restriction: GWP
+jysk_nwgw_oauth2_token_endpoint: https://gw.sap.prod.jysk.local:44300/sap/bc/sec/oauth2/token
+jysk_nwgw_oauth2_client_id: SRV_APIM_P
+#jysk_nwgw_oauth2_client_secret: secrets.yml
+jysk_nwgw_keystore_location: ${carbon.home}/repository/resources/security/jysk-extensions.jks
+jysk_nwgw_keystore_type: JKS
+#jysk_nwgw_keystore_password: secrets.yml
+jysk_nwgw_keystore_key_alias: wso2apim_p_key
+#jysk_nwgw_keystore_key_password: secrets.yml
+jysk_nwgw_cache_access_token_timeout: 3300
+jysk_nwgw_cache_access_token_clock_skew: 60
+jysk_jwtconf_issuer: urn:jysk-com:api:manager:prod
+jysk_jwtconf_userstore_domain: JYSK
+jysk_jwtconf_own_audience: apimanager
+#*****jysk-api-manager-extension.xml.j2 - end******
+
+# Performance tuning configurations
+enable_performance_tuning: true
+performance_tuning_file_list:
+  - { src: '{{ src_files_dir }}/system/etc/sysctl.conf',
+      dest: '/etc/sysctl.conf' }
+  - { src: '{{ src_files_dir }}/system/etc/security/limits.conf',
+      dest: '/etc/security/limits.conf' }
+
+# Configuration of Catalina web server
+transport_https_properties_server: "JYSK API Manager"
+
+# Configuration of Axis2
+transport_passthru_https_sender_parameters_hostnameverifier: AllowAll
+
+# Custom JYSK JWT Generator
+apim_jwt_generator: "com.jysk.wso2.carbon.apimgt.keymgt.token.JWTGenerator"

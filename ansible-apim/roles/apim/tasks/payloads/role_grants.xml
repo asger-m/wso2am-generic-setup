@@ -1,0 +1,56 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xsd="http://org.apache.axis2/xsd">
+        <soap:Header/>
+        <soap:Body>
+            <xsd:setRoleUIPermission>
+                <!--Optional:-->
+                <xsd:roleName>{{ access_role }}</xsd:roleName>
+
+                <xsd:rawResources>/permission/admin/login</xsd:rawResources>
+
+                <xsd:rawResources>/permission/admin/configure</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/configure/security/usermgt</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/configure/security</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/configure/security/usermgt/passwords</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/configure/security/usermgt/profiles</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/configure/security/usermgt/users</xsd:rawResources>
+
+                <xsd:rawResources>/permission/admin/manage</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/keystoremgt/create</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/keystoremgt/delete</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/keystoremgt/update</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/keystoremgt/view</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/rolemgt</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/securitymgt</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/stsmgt</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/usermgt</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/userprofile</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/userstore</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/userstore/config/create</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/userstore/config/delete</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/userstore/config/update</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/userstore/config/view</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/identity/userstore/count</xsd:rawResources>
+
+                <xsd:rawResources>/permission/admin/manage/mediation</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/modify</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/resources</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/search</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/topic</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/manage/tryit</xsd:rawResources>
+
+                <xsd:rawResources>/permission/admin/monitor</xsd:rawResources>
+                <xsd:rawResources>/permission/admin/monitor/tenantUsage/customUsage</xsd:rawResources>
+
+                <xsd:rawResources>/permission/</xsd:rawResources>
+                <xsd:rawResources>/permission/protected</xsd:rawResources>
+                <xsd:rawResources>/permission/protected/configure/components</xsd:rawResources>
+                <xsd:rawResources>/permission/protected/configure/logging</xsd:rawResources>
+                <xsd:rawResources>/permission/protected/manage</xsd:rawResources>
+                <xsd:rawResources>/permission/protected/manage/modify/tenants</xsd:rawResources>
+                <xsd:rawResources>/permission/protected/manage/monitor</xsd:rawResources>
+                <xsd:rawResources>/permission/protected/manage/monitor/tenants/list</xsd:rawResources>
+                <xsd:rawResources>/permission/protected/server-admin</xsd:rawResources>
+            </xsd:setRoleUIPermission>
+        </soap:Body>
+</soap:Envelope>

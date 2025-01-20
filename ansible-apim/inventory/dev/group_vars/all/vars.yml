@@ -1,0 +1,80 @@
+runtime_environment: dev
+ports_offset: 0
+
+# User manager configurations
+admin_username: admin
+admin_password: admin
+
+wso2_group: wso2 # OS group to be created
+wso2_user: wso2carbon # OS user for WSO2 services
+product_name: wso2am
+product_version: 4.3.0
+target: /data # Product installation directory
+
+logs_location: /data/logs # Product installation directory
+product_package_location: files
+backup_dir: /tmp # Artifact backup directory in the instance
+misc_file_location: "{{ product_package_location }}/misc"
+misc_file_copy_location: "{{ target }}/misc"
+security_file_location: "{{ product_package_location }}/security"
+#If you uncomment the below line to set the jdbc driver, change the driver name accordingly
+jdbc_driver: mysql-connector-java-8.0.22.jar
+#jdbc_driver: mssql-jdbc-8.2.2.jre11.jar
+# Database cluster address
+db_server: "{{ lookup('env', 'WSO2AM_NAME') }}-db"
+#db_server: sql-apim
+db_params: autoReconnect=true&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=Europe/Copenhagen
+
+control_lb: "{{ lookup('env', 'WSO2AM_NAME') }}-apim.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
+gateway_lb: "{{ lookup('env', 'WSO2AM_NAME') }}-gateway.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
+
+# Set the location the product packages should reside in (eg: "local" in the /files directory, "remote" in a remote location)
+pack_location: local
+#pack_location: remote
+#remote_jdk: "https://corretto.aws/downloads/latest/amazon-corretto-11-x64-linux-jdk.tar.gz"
+#remote_pack: "<URL_TO_APIM_PACK>"
+
+# JDK Distributions
+setup_java_enabled: true #If this is set to false java_home variable below needs to be specified.
+#jdk_name: amazon-corretto-11.0.13.8.1-linux-x64
+jdk_name: openjdk-17_linux-x64_bin
+java_dir: /opt
+java_symlink: "{{ java_dir }}/java"
+java_home: "{{ java_dir }}/{{ jdk_name }}"
+
+# Database configuration
+wso2am_db_type: mysql
+wso2am_db_url: jdbc:mysql://{{ db_server }}:3306/APIM_DB?{{db_params}}
+wso2am_db_driver: com.mysql.cj.jdbc.Driver
+wso2am_db_test_query: SELECT 1
+
+#wso2am_db_type: mssql
+#wso2am_db_url: jdbc:sqlserver://{{ db_server }}:1433;database=WSO2_DB;SendStringParametersAsUnicode=false
+#wso2am_db_driver: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#wso2am_db_test_query: SELECT 1
+
+
+wso2shared_db_type: mysql
+wso2shared_db_url: jdbc:mysql://{{ db_server }}:3306/SHARED_DB?{{db_params}}
+#wso2shared_db_username: wso2_dbadmin
+#wso2shared_db_password: 123456
+wso2shared_db_driver: com.mysql.cj.jdbc.Driver
+wso2shared_db_test_query: SELECT 1
+
+#wso2shared_db_type: mssql
+#wso2shared_db_url: jdbc:sqlserver://{{ db_server }}:1433;database=WSO2_DB;SendStringParametersAsUnicode=false
+#wso2shared_db_driver: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#wso2shared_db_test_query: SELECT 1
+
+# If following is enabled all the sensitive information in server configurations will be encrypted.
+secure_vault_enabled: true
+
+# Configuration of Catalina web server
+transport_https_properties_server: "API Manager"
+
+# Configuration of Axis2
+transport_passthru_https_sender_parameters_hostnameverifier: AllowAll
+
+# Analytics
+analytics_apim_enabled: false
+analytics_auth_token: "dca58d7e-0dc3-42ff-bb6c-1b07ecb95ce2"

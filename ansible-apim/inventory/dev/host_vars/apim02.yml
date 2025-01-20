@@ -1,0 +1,2 @@
+event_duplicate_url: "tcp://{{ lookup('env', 'WSO2AM_NAME') }}-apim01.{{ lookup('env', 'WSO2AM_DOMAIN') }}:5672"
+#hostname: "apim01.regionh.dk"

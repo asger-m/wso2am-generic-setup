@@ -1,0 +1,130 @@
+# ----------------------------------------------------------------------------
+#  Copyright (c) 2018 WSO2, Inc. http://www.wso2.org
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+# ----------------------------------------------------------------------------
+---
+# NOTE: The parameterized values has the default values from the original pack. Please change them according to your
+# requirements. If you need to add additional configurations, please use the custom.yml under each role.
+
+hostname: "{{ lookup('env', 'WSO2AM_NAME') }}-apim.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
+local_hostname: "{{ ansible_host }}"
+ports_offset: 0
+
+throttle_decision_endpoints: ""
+sync_runtime_gateway_labels: ""
+
+throttle_config_policy_deployer_url: https://{{ hostname }}${carbon.context}services/
+oauth_configs_revoke_api_url: https://{{local_hostname}}:${https.nio.port}/revoke
+#oauth_configs_revoke_api_url: https://{{ hostname }}/oauth2/revoke
+
+# Heap memory allocation
+control_plane_memory: -Xms256m -Xmx1024m
+
+enable_performance_tuning: false
+performance_tuning_file_list:
+  - { src: '{{ product_package_location }}/system/etc/sysctl.conf',
+      dest: '/etc/sysctl.conf' }
+  - { src: '{{ product_package_location }}/system/etc/security/limits.conf',
+      dest: '/etc/security/limits.conf' }
+
+
+misc_file_list:
+   - { src: '/home/asger/work/wso2/RegionH-APIManager42/carbon-secvault-master/components/org.wso2.carbon.secvault/target/org.wso2.carbon.secvault-0.1.jar',
+       dest: '{{ carbon_home }}/repository/components/dropins/org.wso2.carbon.secvault-0.1.jar' }
+#   - { src: 'files/lib/jolokia-osgi-1.3.6.jar',
+#       dest: '{{ carbon_home }}/repository/components/dropins/jolokia-osgi-1.3.6.jar' }
+#   - { src: '../identity-inbound-auth-oauth-master/components/org.wso2.carbon.identity.oauth.endpoint/target/oauth2.war',
+#       dest: '{{ carbon_home }}/repository/deployment/server/webapps/oauth2.war' }
+#   - { src: 'files/custom/adminsettings.json',
+#       dest: '{{ carbon_home }}/repository/deployment/server/webapps/admin/site/public/conf/settings.json' }
+#   - { src: 'files/custom/devPortalsettings.json',
+#       dest: '{{ carbon_home }}/repository/deployment/server/webapps/devportal/site/public/theme/settings.json' }
+#   - { src: 'files/custom/publishersettings.json',
+#       dest: '{{ carbon_home }}/repository/deployment/server/webapps/publisher/site/public/conf/settings.json' }
+
+
+trust_certs:
+  - { src: "{{ lookup('env', 'WSO2AM_NAME') }}-cert.pem",
+      alias: "{{ lookup('env', 'WSO2AM_NAME') }}" }
+
+config_files:
+  - { src: 'carbon-home/repository/conf/deployment.toml.j2',
+      dest: '{{ carbon_home }}/repository/conf/deployment.toml' }
+  - { src: 'carbon-home/repository/conf/deployment.toml.j2',
+      dest: '{{ carbon_home }}/repository/resources/conf/deployment-templates/control-plane.toml' }
+  - { src: 'carbon-home/repository/conf/log4j2.properties.j2',
+      dest: '{{ carbon_home }}/repository/conf/log4j2.properties' }
+  - { src: 'carbon-home/bin/api-manager.sh.j2',
+      dest: '{{ carbon_home }}/bin/api-manager.sh' }
+#  - { src: 'carbon-home/repository/conf/carbon.xml.j2',
+#      dest: '{{ carbon_home }}/repository/conf/carbon.xml' }
+#  - { src: 'carbon-home/repository/deployment/server/userstores/test.xml.j2',
+#      dest: '{{ carbon_home }}/repository/deployment/server/userstores/test.xml' }
+  - { src: 'carbon-home/repository/webapps/publisher/settings.json.j2',
+      dest: '{{ carbon_home }}/repository/deployment/server/webapps/publisher/site/public/conf/settings.json' }
+  - { src: 'carbon-home/repository/webapps/admin/settings.json.j2',
+      dest: '{{ carbon_home }}/repository/deployment/server/webapps/admin/site/public/conf/settings.json' }
+  - { src: 'carbon-home/repository/webapps/devportal/settings.json.j2',
+      dest: '{{ carbon_home }}/repository/deployment/server/webapps/devportal/site/public/theme/settings.json' }
+
+security_file_list:
+  - { src: "{{ security_file_location }}/{{ lookup('env', 'WSO2AM_NAME') }}.jks",
+      dest: "{{ carbon_home }}/repository/resources/security/wso2carbon.jks" }
+
+# Gateway configurations
+gateway_environments:
+  - { type: 'production',
+     name: 'Internal',
+     description: 'This is a hybrid gateway that handles both production and sandbox token traffic.',
+     service_url: 'https://{{ gateway_lb }}/services/',
+     api_console: 'true',
+     token_endpoint: 'false',
+#     ws_endpoint: 'ws://lb-gateway42.regionh.dk:9099',
+     wss_endpoint: 'wss://{{ gateway_lb }}:8099',
+#     http_endpoint: 'http://lb-gateway42.regionh.dk:${http.nio.port}',
+     https_endpoint: 'https://{{ gateway_lb }}:8243'}
+#     websub_event_receiver_http_endpoint: "http://lb-gateway42.regionh.dk:9021",
+#     websub_event_receiver_https_endpoint: "https://lb-gateway42.regionh.dk:8021"}
+  # - { type: 'production',
+  #    name: 'External',
+  #    description: 'This is a hybrid gateway that handles both production and sandbox token traffic.',
+  #    service_url: 'https://mgmt.regionh.dk/services/',
+  #    api_console: 'true',
+  #    token_endpoint: 'false',
+  #    ws_endpoint: 'ws://gateway02.regionh.dk:9099',
+  #    wss_endpoint: 'wss://gateway02.regionh.dk:8099',
+  #    http_endpoint: 'http://gateway02.regionh.dk:${http.nio.port}',
+  #    https_endpoint: 'https://gateway02.regionh.dk:8243',
+  #    websub_event_receiver_http_endpoint: "http://localhost:9021",
+  #    websub_event_receiver_https_endpoint: "https://localhost:8021"}
+
+key_manager_server_url: https://{{ hostname }}${carbon.context}services/
+api_devportal_url: https://{{ hostname }}/devportal
+api_devportal_server_url: https://{{ hostname }}${carbon.context}services/
+
+# Key Store and Trust Store configuration
+primary_key_store_name: wso2carbon.jks
+primary_key_store_key_alias: wso2carbon
+
+# Client trustore configurations
+trust_store_name: client-truststore.jks
+trust_store_password: wso2carbon
+
+# The KeyStore which is used for encrypting/decrypting internal data. This block is read by Carbon Crypto Service
+internal_key_store_name: wso2carbon.jks
+internal_key_store_key_alias: wso2carbon
+
+# The KeyStore which is used for encrypting/decrypting internal data. This block is read by Carbon Crypto Service
+tls_key_store_name: wso2carbon.jks
+tls_key_store_key_alias: wso2carbon

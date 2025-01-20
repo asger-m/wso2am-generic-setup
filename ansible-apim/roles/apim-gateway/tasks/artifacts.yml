@@ -1,0 +1,13 @@
+---
+  - name: Copy Custom Artifacts
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+    loop: "{{ custom_artifacts_list }}"
+    when: custom_artifacts_list is defined
+
+  - name: Copy API Template
+    copy:
+      src: "{{ product_package_location }}/resources/api_templates/velocity_template.xml"
+      dest: "{{ carbon_home }}/repository/resources/api_templates/velocity_template.xml"
+    when: custom_artifacts_list is defined

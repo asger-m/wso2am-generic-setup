@@ -1,0 +1,29 @@
+# use this in playbook to call the trust task
+#
+#
+#    - name: Import certs to truststore
+#      include_tasks: trust.yml
+#      loop: "{{ trust_certs }}"
+#      when: trust_certs is defined
+
+---
+  - name: Copy cert
+    copy:
+      src: "{{ security_file_location }}/{{ item.src }}"
+      dest: "/tmp"
+      owner: "{{ wso2_user }}"
+      group: "{{ wso2_group }}"
+
+  - name: Import cert
+    community.general.java_cert:
+      cert_path: "/tmp/{{ item.src }}"
+      keystore_path: "{{ carbon_home }}/repository/resources/security/{{trust_store_name}}"
+      keystore_pass: "{{ trust_store_password }}"
+      state: present
+      cert_alias: "{{ item.alias }}"
+      executable: "{{java_home}}/bin/keytool"
+
+  - name: Remove cert
+    file:
+      path: "/tmp/{{ item.src }}"
+      state: absent

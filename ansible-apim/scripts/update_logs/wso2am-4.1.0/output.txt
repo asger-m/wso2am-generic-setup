@@ -1,0 +1,3 @@
+Error: unknown command "Modified: {{.Modified}}, Conflicts: {{.Conflicts}}" for "wso2update"
+Run 'wso2update --help' for usage.
+wso2update: unknown command "Modified: {{.Modified}}, Conflicts: {{.Conflicts}}" for "wso2update"

@@ -1,0 +1,14 @@
+
+- name: Creating a file with content
+  copy:
+    dest: "{{ carbon_home }}/password-persist"
+    content: |
+      {{ internal_key_store_password }}
+  when: secure_vault_enabled|bool
+
+- name: Change the owner of WSO2 directory
+  file:
+    path: "{{ carbon_home }}/password-persist"
+    owner: "{{ wso2_user }}"
+    group: "{{ wso2_group }}"
+    mode: 0755

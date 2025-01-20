@@ -1,0 +1,9 @@
+
+- name: Run Secure Vault to Encrypt passwords
+  command: "{{ carbon_home }}/bin/ciphertool.sh -Dconfigure -Dpassword={{ internal_key_store_password }}"
+  environment:
+    JAVA_HOME: "{{ java_home }}"
+  args:
+    chdir: "{{ carbon_home }}"
+  when: secure_vault_enabled|bool
+

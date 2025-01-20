@@ -1,0 +1,105 @@
+[server]
+hostname = "{{hostname}}"
+# offset  = {{ports_offset}}
+
+[cluster_config]
+node_id = "{{node_id}}"
+
+[user_store]
+type = "read_only_ldap"
+
+[keystore.primary]
+file_name = "repository/resources/security/{{primary_key_store_name}}"
+password = "{{primary_key_store_password}}"
+alias = "{{primary_key_store_key_alias}}"
+key_password = "{{primary_key_store_key_password}}"
+
+[truststore]
+file_name = "repository/resources/security/{{trust_store_name}}"
+password = "{{trust_store_password}}"
+alias = "{{trust_store_alias}}"
+algorithm = "{{trust_store_algorithm}}"
+
+## Following are set of example configs. Please refer docs for complete set of configurations.
+
+# [transport.http]
+# socket_timeout = {{http_socket_timeout}}   # timeout in milliseconds
+# disable_connection_keepalive = {{disabled_connection_alive}}
+# connection_timeout = {{http_connection_timeout}} # in milliseconds
+
+# [transport.jms]
+# sender_enable = true
+# listener_enable = true
+
+# [[transport.jms.sender]]
+# name = "myQueueSender"
+# parameter.initial_naming_factory = "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+# parameter.provider_url = "tcp://localhost:61616"
+# parameter.connection_factory_name = "QueueConnectionFactory"
+# parameter.connection_factory_type = "queue"
+# parameter.cache_level = "producer"
+
+#[[transport.jms.listener]]
+# name = "myQueueConnectionFactory"
+# parameter.initial_naming_factory = "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+# parameter.provider_url = "tcp://localhost:61616"
+# parameter.connection_factory_name = "QueueConnectionFactory"
+# parameter.connection_factory_type = "queue"
+
+# [transport.jndi.connection_factories]
+# 'connectionfactory.QueueConnectionFactory' = "amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5675'"
+# 'connectionfactory.TopicConnectionFactory' = "amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5675'"
+
+# [transport.jndi.queue]
+# jndiNameOfQueue = "physicalNameOfQueue"
+
+# [transport.jndi.topic]
+# jndiNameOfTopic = "physicalNameOfTopic"
+
+# [transport.rabbitmq]
+# sender_enable = true
+# listener_enable = true
+
+# [[transport.rabbitmq.sender]]
+# name = "AMQPConnectionFactory"
+# parameter.hostname = "localhost"
+# parameter.port = 5672
+# parameter.username = "guest"
+# parameter.password = "guest"
+
+# [[transport.rabbitmq.listener]]
+# name = "AMQPConnectionFactory"
+# parameter.hostname = "localhost"
+# parameter.port = 5672
+# parameter.username = "guest"
+# parameter.password = "guest"
+
+# [system.parameter]
+# 'key' = "value"
+
+
+# [management_api]
+# protocols = "http"
+
+# [[internal_apis.users]]
+# user.name = "user-1"
+# user.password = "pwd-1"
+
+# [transaction_counter]
+# enable = true
+# data_source = "WSO2CarbonDB"
+# update_interval = 2
+
+# [mediation]
+# synapse.global_timeout_interval = "120000"  # interval in milliseconds
+
+# [secrets]
+# secret_key = "[secret value]"
+
+[[service_catalog]]
+apim_host = "{{apim_host}}"
+enable = true
+username = "{{service_username}}"
+password = "{{service_password}}"
+
+#https://apim.docs.wso2.com/en/latest/reference/config-catalog-mi/

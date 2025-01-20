@@ -1,0 +1,81 @@
+---
+  - block:
+
+    - name: Register client
+      uri:
+        url: "https://{{ hostname }}/client-registration/v0.17/register"
+        user: "{{ admin_username }}"
+        password: "{{ admin_password }}"
+        force_basic_auth: yes
+        method: POST
+        body: >
+          {
+          "callbackUrl":"",
+          "clientName":"rest_api_admin",
+          "owner":"admin",
+          "grantType":"client_credentials password",
+          "saasApp":true
+          }
+        validate_certs: no
+        status_code: 200
+        return_content: yes
+        headers:
+          Content-Type: application/json
+      register: client_registration
+
+    - debug: msg="{{ client_registration.json }}"
+
+    - name: Get token
+      uri:
+        url: "https://{{ hostname }}/oauth2/token"
+        user: "{{ client_registration.json.clientId }}"
+        password: "{{ client_registration.json.clientSecret }}"
+        force_basic_auth: yes
+        method: POST
+        body: "grant_type=client_credentials&scope=apim:scope_manage apim:admin"
+        validate_certs: no
+        status_code: 200
+        return_content: yes
+        headers:
+          Content-Type: application/x-www-form-urlencoded
+      register: admin_token
+
+    - debug: msg="{{ admin_token.json.access_token }}"
+
+    - name: Put mapping
+      uri:
+        url: "https://{{ hostname }}/api/am/admin/v3/system-scopes/role-aliases"
+        force_basic_auth: yes
+        headers:
+          Content-Type: application/json
+#          Authorization: "Bearer f68f1c0a-0f6e-3afb-8e23-2c0fa917f667"
+          Authorization: "Bearer {{ admin_token.json.access_token }}"
+        method: PUT
+        body: >
+          {
+            "count" : 2,
+            "list": [
+              {
+                "role" : "Internal/subscriber",
+                "aliases" : ["guest"]
+              },
+              {
+                "role" : "Internal/creater",
+                "aliases" : ["guest"]
+              }
+            ]
+          }
+        validate_certs: no
+        status_code: 200
+        return_content: yes
+      register: mapping_response
+      tags:
+        - just_put
+
+    - debug: msg="{{ mapping_response }}"
+
+      tags:
+        - acl
+
+    become: true
+    become_user: root

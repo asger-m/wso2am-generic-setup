@@ -1,0 +1,27 @@
+- block:
+
+  - name: "Wait for WSO2 startup"
+    wait_for:
+      host: "{{ ansible_host }}"
+      port: 9443
+      timeout: 300
+    tags:
+      - service_start
+      - service_restart
+
+  - name: "Wait for WSO2 response"
+    uri:
+      url: "https://{{ ansible_host }}:9443/services/Version"
+      follow_redirects: none
+      method: GET
+      validate_certs: no
+    register: _result
+    until: _result.status == 200
+    retries: 60
+    delay: 5
+    tags:
+      - service_start
+      - service_restart
+
+  when: enable_service_start|bool
+
