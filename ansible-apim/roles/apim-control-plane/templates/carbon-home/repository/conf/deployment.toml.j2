@@ -54,17 +54,22 @@ password =  "{% if secure_vault_enabled|bool %}$secret{internal_key_store_passwo
 alias =  "{{ internal_key_store_key_alias }}"
 key_password =  "{% if secure_vault_enabled|bool %}$secret{internal_key_store_key_password}{% else %}{{ internal_key_store_key_password }}{% endif %}"
 
+[truststore]
+file_name = "{{ trust_store_name }}"
+type = "JKS"
+password = "{% if secure_vault_enabled|bool %}$secret{trust_store_password}{% else %}{{ trust_store_password }}{% endif %}"
+
 [admin_service.wsdl]
-enable = true
+enable = false
 
 {% for environment in gateway_environments %}
     [[apim.gateway.environment]]
     name = "{{ environment.name }}"
     type = "{{ environment.type }}"
-    gateway_type = "Regular"
-    display_in_api_console = true
+    gateway_type = "{{ environment.type }}"
+    display_in_api_console = {{ environment.api_console }}
     description = "{{ environment.description }}"
-    show_as_token_endpoint_url = true
+    show_as_token_endpoint_url = {{ environment.token_endpoint }}
     provider = "wso2"
     service_url = "{{ environment.service_url }}"
     username= "${admin.username}"
@@ -165,7 +170,7 @@ application_sharing_claim="http://wso2.org/claims/role"
 
 [apim.cors]
 enable = true
-allow_origins = "*.regionh.dk"
+allow_origins = "*.{{ domainname }}"
 allow_methods = ["GET","PUT","POST","DELETE","PATCH","OPTIONS"]
 allow_headers = ["authorization","Access-Control-Allow-Origin","Content-Type","SOAPAction","apikey","Internal-Key"]
 allow_credentials = false
@@ -288,10 +293,14 @@ name = "org.wso2.is.notification.ApimOauthEventInterceptor"
 order = 1
 
 [event_listener.properties]
-notification_endpoint = "https://{{hostname}}/internal/data/v1/notify"
+notification_endpoint = "https://{{local_hostname}}:${mgt.transport.https.port}/internal/data/v1/notify"
+#notification_endpoint = "https://{{hostname}}/internal/data/v1/notify"
 username = "${admin.username}"
 password = "${admin.password}"
 'header.X-WSO2-KEY-MANAGER' = "default"
+
+[apim.ws]
+enable = false
 
 [transport.passthru_http.listener]
 enable = false

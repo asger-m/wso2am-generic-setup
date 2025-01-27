@@ -14,7 +14,6 @@
 #  limitations under the License.
 # ----------------------------------------------------------------------------
 
-hostname: "{{ lookup('env', 'WSO2AM_NAME') }}-gateway.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
 
 oauth_configs_revoke_api_url: "https://{{ control_lb }}/oauth2/revoke"
 

@@ -14,12 +14,7 @@
 #  limitations under the License.
 # ----------------------------------------------------------------------------
 
-hostname: "{{ lookup('env', 'WSO2AM_NAME') }}-apim.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
 local_hostname: "{{ ansible_host }}"
-
-access_role: Role1
-admin_username: admin
-admin_password: admin
 
 oauth_configs_revoke_api_url: https://{{local_hostname}}:${https.nio.port}/revoke
 
@@ -38,10 +33,9 @@ performance_tuning_file_list:
       dest: '/etc/security/limits.conf' }
 
 trust_certs:
-  - { src: 'regionh-cert.pem',
-      alias: 'regionh' }
+  - { src: "{{ lookup('env', 'WSO2AM_NAME') }}-cert.pem",
+      alias: "{{ lookup('env', 'WSO2AM_NAME') }}" }
 
-# List of configuration file templates, and the paths they should be written to
 config_files:
   - { src: 'carbon-home/repository/conf/deployment.toml.j2',
       dest: '{{ carbon_home }}/repository/conf/deployment.toml' }
@@ -49,26 +43,20 @@ config_files:
       dest: '{{ carbon_home }}/repository/conf/log4j2.properties' }
   - { src: 'carbon-home/bin/api-manager.sh.j2',
       dest: '{{ carbon_home }}/bin/api-manager.sh' }
-  - { src: 'carbon-home/repository/conf/carbon.xml.j2',
-      dest: '{{ carbon_home }}/repository/conf/carbon.xml' }
-  - { src: 'carbon-home/repository/conf/carbon.xml.j2',
-      dest: '{{ carbon_home }}/repository/conf/carbon.xml' }
+#  - { src: 'carbon-home/repository/conf/carbon.xml.j2',
+#      dest: '{{ carbon_home }}/repository/conf/carbon.xml' }
+
+
+custom_artifacts_list:
+#  - { src: '{{ product_package_location }}/custom_artifacts/customTokenHandler-1.0-SNAPSHOT.jar',
+#      dest: '{{ carbon_home }}/repository/components/lib/customTokenHandler-1.0-SNAPSHOT.jar' }
 
 # If custom primary keystores and trsustrores are need to be added, uncomment the below list
 # Add the required files under files/security/<product-home>/<path-to-file>
 # A sample is given below
 security_file_list:
-  - { src: '{{ security_file_location }}/{{product_name}}/regionh.jks',
+  - { src: "{{ security_file_location }}/{{ lookup('env', 'WSO2AM_NAME') }}.jks",
       dest: '{{ carbon_home }}/repository/resources/security/wso2carbon.jks' }
-#   - { src: '{{ security_file_location }}/wso2am/client-truststore.jks',
-#       dest: '{{ carbon_home }}/repository/resources/security/client-truststore.jks' }
-
-# If custom tls keystore needs to be added, uncomment the below list
-# Add the required files under files/security/<product-home>/<path-to-file>
-# A sample is given below
-# security_file_list:
-#   - { src: '{{ security_file_location }}/wso2am/tls.jks',
-#       dest: '{{ carbon_home }}/repository/resources/security/tls.jks' }
 
 # If custom internal keystore needs to be added, uncomment the below list
 # Add the required files under files/security/<product-home>/<path-to-file>
@@ -90,35 +78,39 @@ security_file_list:
 # Gateway configurations
 gateway_environments:
   - { type: 'hybrid',
-      name: 'Internal',
-      description: 'This is a hybrid gateway that handles both production and sandbox token traffic.',
-      service_url: 'https://{{local_hostname}}:${mgt.transport.https.port}/services/',
-      api_console: 'true',
-      token_endpoint: 'true',
-      ws_endpoint: 'ws://{{hostname}}:9099',
-      wss_endpoint: 'wss://{{hostname}}:8099',
-      http_endpoint: 'http://{{hostname}}.dk:${http.nio.port}',
-      https_endpoint: 'https://{{hostname}}:${https.nio.port}',
-      websub_event_receiver_http_endpoint: "http://{{hostname}}:9021",
-      websub_event_receiver_https_endpoint: "https://{{hostname}}:8021"}
-  - { type: 'production',
-     name: 'External',
+     name: 'Internal',
      description: 'This is a hybrid gateway that handles both production and sandbox token traffic.',
-     service_url: 'https://lb-gateway.regionh.dk:${mgt.transport.https.port}/services/',
-     api_console: 'false',
-     token_endpoint: 'false',
-     ws_endpoint: 'ws://lb-gateway.regionh.dk:9099',
-     wss_endpoint: 'wss://lb-gateway.regionh.dk:8099',
-     http_endpoint: 'http://lb-gateway.regionh.dk:${http.nio.port}',
-     https_endpoint: 'https://lb-gateway.regionh.dk',
-     websub_event_receiver_http_endpoint: "http://localhost:9021",
-     websub_event_receiver_https_endpoint: "https://localhost:8021"}
+     service_url: 'https://{{local_hostname}}:${mgt.transport.https.port}/services/',
+     token_endpoint: 'true',
+     api_console: 'true',
+#     ws_endpoint: 'ws://lb-gateway42.regionh.dk:9099',
+     wss_endpoint: 'wss://{{ hostname }}:8099',
+#     http_endpoint: 'http://lb-gateway42.regionh.dk:${http.nio.port}',
+     https_endpoint: 'https://{{ hostname }}:${https.nio.port}'
+#     websub_event_receiver_http_endpoint: "http://lb-gateway42.regionh.dk:9021",
+#     websub_event_receiver_https_endpoint: "https://lb-gateway42.regionh.dk:8021"
+   }
+ - { type: 'production',
+    name: 'External',
+    description: 'This is a hybrid gateway that handles both production and sandbox token traffic.',
+    service_url: 'https://mgmt.regionh.dk/services/',
+    api_console: 'true',
+    token_endpoint: 'false',
+    ws_endpoint: 'ws://{{ gateway_lb }}:9099',
+#    wss_endpoint: 'wss://gateway02.regionh.dk:8099',
+#    http_endpoint: 'http://gateway02.regionh.dk:${http.nio.port}',
+    https_endpoint: 'https://{{ gateway_lb }}:8243'
+  #    websub_event_receiver_http_endpoint: "http://localhost:9021",
+  #    websub_event_receiver_https_endpoint: "https://localhost:8021"
+   }
+
 
 sync_runtime_gateway_labels: ["Internal"]
 
-key_manager_server_url: https://{{hostname}}${carbon.context}services/
-api_devportal_url: https://{{hostname}}/devportal
-api_devportal_server_url: https://{{hostname}}${carbon.context}services/
+key_manager_server_url: https://{{ hostname }}${carbon.context}services/
+api_devportal_url: https://{{ hostname }}/devportal
+api_devportal_server_url: https://{{ hostname }}${carbon.context}services/
+
 # Traffic Manager configurations
 throttle_decision_endpoints:
   - tcp://apim01.regionh.dk:5672
@@ -133,8 +125,6 @@ throttling_url_group:
     traffic_manager_auth_urls:
       - ssl://apim02.regionh.dk:9711
 
-throttle_decision_endpoints: ""
-sync_runtime_gateway_labels: ""
 
 # Workflow configurations
 workflow_enable: "false"

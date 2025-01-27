@@ -1,12 +1,13 @@
 [server]
 hostname = "{{ hostname }}"
+internal_hostname = "{{ local_hostname }}"
 offset = "{{ ports_offset }}"
 base_path = "${carbon.protocol}://${carbon.host}:${carbon.management.port}"
 #discard_empty_caches = false
-server_role = "default"
+server_role = "control-plane"
 
 [super_admin]
-username = "{% if secure_vault_enabled|bool %}$secret{admin_username}{% else %}{{ admin_username }}{% endif %}"
+username = "{{ admin_username }}"
 password = "{% if secure_vault_enabled|bool %}$secret{admin_password}{% else %}{{ admin_password }}{% endif %}"
 create_admin_account = true
 
@@ -18,6 +19,10 @@ type = "{{ wso2am_db_type }}"
 url = "{{ wso2am_db_url }}"
 username = "{% if secure_vault_enabled|bool %}$secret{wso2am_db_username}{% else %}{{ wso2am_db_username }}{% endif %}"
 password = "{% if secure_vault_enabled|bool %}$secret{wso2am_db_password}{% else %}{{ wso2am_db_password }}{% endif %}"
+pool_options.maxActive=50
+pool_options.removeAbandoned=true
+pool_options.removeAbandonedTimeout=2
+pool_options.logAbandoned=true
 
 [database.shared_db]
 type = "{{ wso2shared_db_type }}"
@@ -51,25 +56,30 @@ file_name = "{{ trust_store_name }}"
 type = "JKS"
 password = "{% if secure_vault_enabled|bool %}$secret{trust_store_password}{% else %}{{ trust_store_password }}{% endif %}"
 
+[admin_service.wsdl]
+enable = false
+
 {% for environment in gateway_environments %}
     [[apim.gateway.environment]]
     name = "{{ environment.name }}"
     type = "{{ environment.type }}"
+    gateway_type = "{{ environment.type }}"
     display_in_api_console = {{ environment.api_console }}
     description = "{{ environment.description }}"
     show_as_token_endpoint_url = {{ environment.token_endpoint }}
+    provider = "wso2"
     service_url = "{{ environment.service_url }}"
     username= "${admin.username}"
     password= "${admin.password}"
-    ws_endpoint = "{{ environment.ws_endpoint }}"
     wss_endpoint = "{{ environment.wss_endpoint }}"
     https_endpoint = "{{ environment.https_endpoint }}"
-    websub_event_receiver_http_endpoint = "{{environment.websub_event_receiver_http_endpoint}}"
-    websub_event_receiver_https_endpoint = "{{environment.websub_event_receiver_https_endpoint}}"
 {% endfor %}
 
 [apim.sync_runtime_artifacts.gateway]
 gateway_labels = [{% for label in sync_runtime_gateway_labels %}"{{ label }}"{%- if not loop.last -%},{% endif %}{% endfor %}]
+
+[apim.sync_runtime_artifacts.gateway.skip_list]
+apis = ["token_api_file_name.xml"]
 
 [apim.cache_invalidation]
 enabled = true
@@ -138,9 +148,10 @@ enable_token_hashing = false
 
 [apim.devportal]
 url = "{{ api_devportal_url }}"
-#enable_application_sharing = false
+enable_application_sharing = true
 #if application_sharing_type, application_sharing_impl both defined priority goes to application_sharing_impl
-#application_sharing_type = "default" #changed type, saml, default #todo: check the new config for rest api
+application_sharing_type = "default" #changed type, saml, default #todo: check the new config for rest api
+application_sharing_claim="http://wso2.org/claims/role"
 #application_sharing_impl = "org.wso2.carbon.apimgt.impl.SAMLGroupIDExtractorImpl"
 #display_multiple_versions = false
 #display_deprecated_apis = false
@@ -151,19 +162,25 @@ url = "{{ api_devportal_url }}"
 #enable_cross_tenant_subscriptions = true
 #default_reserved_username = "apim_reserved_user"
 
+#[apim.publisher]
+#enable_portal_configuration_only_mode = false
+
 [apim.cors]
-allow_origins = "*"
+allow_origins = "*.{{ domainname }}"
 allow_methods = ["GET","PUT","POST","DELETE","PATCH","OPTIONS"]
 allow_headers = ["authorization","Access-Control-Allow-Origin","Content-Type","SOAPAction","apikey","Internal-Key"]
 allow_credentials = false
 
-#[apim.throttling]
-event_duplicate_url = ["{{event_duplicate_url}}"]
-#enable_data_publishing = true
-#enable_policy_deploy = true
-#enable_blacklist_condition = true
-#enable_persistence = true
+[apim.throttling]
+service_url = "{{ traffic_manager_host_url }}/services/"
+username = "$ref{super_admin.username}"
+password = "$ref{super_admin.password}"
+enable_unlimited_tier = true
+enable_header_based_throttling = false
+enable_jwt_claim_based_throttling = false
+enable_query_param_based_throttling = false
 throttle_decision_endpoints = [{% for endpoint in throttle_decision_endpoints %}"{{ endpoint }}"{%- if not loop.last -%},{% endif %}{% endfor %}]
+
 
 #[apim.throttling.blacklist_condition]
 #start_delay = "5m"
@@ -191,6 +208,37 @@ type = "loadbalance"
 #traffic_manager_urls = ["tcp://localhost:9611","tcp://localhost:9611"]
 #traffic_manager_auth_urls = ["ssl://localhost:9711","ssl://localhost:9711"]
 #type = "failover"
+
+{% if analytics_apim_enabled is defined %}
+[apim.analytics]
+enable = "{{ analytics_apim_enabled | bool | lower }}"
+type = "elk"
+#config_endpoint = "https://analytics-event-auth.choreo.dev/auth/v1"
+#auth_token = "{% if secure_vault_enabled|bool %}$secret{analytics_auth_token}{% else %}{{ analytics_auth_token }}{% endif %}"
+#properties.'worker.thread.count' = 1
+#properties.'queue.size' = 10000
+#properties.'client.flushing.delay' = 5000
+{% endif %}
+
+# Caches
+[apim.cache.jwt_claim]
+enable = true
+expiry_time = 900
+
+[apim.cache.gateway_token]
+enable = true
+expiry_time = "900s"
+
+[apim.cache.resource]
+enable = true
+expiry_time = "900s"
+
+[apim.oauth_config]
+enable_outbound_auth_header = true
+auth_header = "Authorization"
+#remove_outbound_auth_header = false
+enable_token_encryption = false
+enable_token_hashing = false
 
 #[apim.workflow]
 #enable = false
@@ -236,6 +284,27 @@ type = "loadbalance"
 #persistent_notifier.username = "root"
 #persistent_notifier.password = "root"
 
+#[oauth]
+#jwt_x5t_hexify_required = false
+#add_tenant_domain_to_access_token = true
+
+[oauth.token_persistence]
+enable=false
+
+[oauth.revoked_token_headers_in_response]
+enable=false
+
+"[[oauth.extensions.token_types]]
+"name = "JWT"
+"issuer = "org.wso2.is.key.manager.tokenpersistence.issuer.ExtendedJWTTokenIssuer"  
+
+[oauth.jwks_endpoint]
+is_thumbprint_hexify_required = true
+
+[oauth.token_cleanup]
+enable = true
+retain_access_tokens_for_auditing = true
+
 [[event_handler]]
 name="userPostSelfRegistration"
 subscriptions=["POST_ADD_USER"]
@@ -265,14 +334,23 @@ enable = false
 enable = false
 
 [transport.http]
-enable = false
+enable = true
 
 [transport.https.properties]
 server="RegionH API Server"
-#proxyPort = 443
+proxyPort = 443
+maxHttpHeaderSize = 32768
 
-[transport.http.properties]
-server="RegionH API Server"
+[transport.passthru_https.listener.parameters]
+HttpsProtocols = "TLSv1.2,TLSv1.3"
+PreferredCiphers = "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384"
+
+[transport.https.sslHostConfig.properties]
+sslEnabledProtocols="TLSv1.1,TLSv1.2"
+ciphers="TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384, TLS_DHE_DSS_WITH_AES_256_GCM_SHA384, TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256, TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256, TLS_DHE_DSS_WITH_AES_128_GCM_SHA256, TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384, TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384, TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, TLS_DHE_DSS_WITH_AES_256_CBC_SHA256, TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA, TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA, TLS_ECDH_RSA_WITH_AES_256_CBC_SHA, TLS_DHE_DSS_WITH_AES_256_CBC_SHA, TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256, TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA, TLS_ECDH_RSA_WITH_AES_128_CBC_SHA, TLS_DHE_DSS_WITH_AES_128_CBC_SHA, TLS_ECDHE_ECDSA_WITH_RC4_128_SHA, TLS_ECDH_ECDSA_WITH_RC4_128_SHA, TLS_ECDH_RSA_WITH_RC4_128_SHA, TLS_EMPTY_RENEGOTIATION_INFO_SCSVF"
+
+[transport.passthru_https.sender.parameters]
+HostnameVerifier = "Strict"
 
 {% if secure_vault_enabled|bool %}
 [secrets]

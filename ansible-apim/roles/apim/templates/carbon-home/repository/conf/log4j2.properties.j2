@@ -1,6 +1,6 @@
 # list of all appenders
 #add entry "syslog" to use the syslog appender
-appenders=CARBON_CONSOLE, CARBON_LOGFILE, AUDIT_LOGFILE, ATOMIKOS_LOGFILE, CARBON_TRACE_LOGFILE,ERROR_LOGFILE, OPEN_TRACING,SERVICE_APPENDER, TRACE_APPENDER, osgi, CORRELATION, BOTDATA_APPENDER
+appenders=CARBON_CONSOLE, HTTP_ACCESS, WIRE_LOG, APIM_METRICS_APPENDER, CARBON_LOGFILE, AUDIT_LOGFILE, ATOMIKOS_LOGFILE, CARBON_TRACE_LOGFILE,ERROR_LOGFILE, OPEN_TRACING,SERVICE_APPENDER, TRACE_APPENDER, osgi, CORRELATION, BOTDATA_APPENDER, API_LOGFILE
 #, syslog
 
 # CARBON_CONSOLE is set to be a ConsoleAppender using a PatternLayout.
@@ -15,8 +15,8 @@ appender.CARBON_CONSOLE.filter.threshold.level = DEBUG
 # CARBON_LOGFILE is set to be a DailyRollingFileAppender using a PatternLayout.
 appender.CARBON_LOGFILE.type = RollingFile
 appender.CARBON_LOGFILE.name = CARBON_LOGFILE
-appender.CARBON_LOGFILE.fileName = {{ logs_location }}/repository/logs/wso2carbon.log
-appender.CARBON_LOGFILE.filePattern = {{ logs_location }}/repository/logs/wso2carbon-%d{MM-dd-yyyy}.log
+appender.CARBON_LOGFILE.fileName = {{ logs_location }}/wso2carbon.log
+appender.CARBON_LOGFILE.filePattern = {{ logs_location }}/wso2carbon-%d{MM-dd-yyyy}.log
 appender.CARBON_LOGFILE.layout.type = PatternLayout
 appender.CARBON_LOGFILE.layout.pattern = {% raw %}TID: [%tenantId] [%appName] [%d] %5p {%c} - %m%ex%n
 {% endraw %}
@@ -34,8 +34,8 @@ appender.CARBON_LOGFILE.filter.threshold.level = DEBUG
 # Appender config to AUDIT_LOGFILE
 appender.AUDIT_LOGFILE.type = RollingFile
 appender.AUDIT_LOGFILE.name = AUDIT_LOGFILE
-appender.AUDIT_LOGFILE.fileName = {{ logs_location }}/repository/logs/audit.log
-appender.AUDIT_LOGFILE.filePattern = {{ logs_location }}/repository/logs/audit-%d{MM-dd-yyyy}.log
+appender.AUDIT_LOGFILE.fileName = {{ logs_location }}/audit.log
+appender.AUDIT_LOGFILE.filePattern = {{ logs_location }}/audit-%d{MM-dd-yyyy}.log
 appender.AUDIT_LOGFILE.layout.type = PatternLayout
 appender.AUDIT_LOGFILE.layout.pattern = {% raw %}TID: [%tenantId] [%d] %5p {%c} - %m%ex%n
 {% endraw %}
@@ -50,11 +50,30 @@ appender.AUDIT_LOGFILE.strategy.max = 20
 appender.AUDIT_LOGFILE.filter.threshold.type = ThresholdFilter
 appender.AUDIT_LOGFILE.filter.threshold.level = INFO
 
+# Appender config API logging
+appender.API_LOGFILE.type = RollingFile
+appender.API_LOGFILE.name = API_LOGFILE
+appender.API_LOGFILE.fileName = {{ logs_location }}/api.log
+appender.API_LOGFILE.filePattern = {{ logs_location }}/api-%d{MM-dd-yyyy}-%i.log
+appender.API_LOGFILE.layout.type = PatternLayout
+appender.API_LOGFILE.layout.pattern = {% raw %}[%d] %5p {%c} %X{apiName} - %m%ex%n
+{% endraw %}
+appender.API_LOGFILE.policies.type = Policies
+appender.API_LOGFILE.policies.time.type = TimeBasedTriggeringPolicy
+appender.API_LOGFILE.policies.time.interval = 1
+appender.API_LOGFILE.policies.time.modulate = true
+appender.API_LOGFILE.policies.size.type = SizeBasedTriggeringPolicy
+appender.API_LOGFILE.policies.size.size = 10MB
+appender.API_LOGFILE.strategy.type = DefaultRolloverStrategy
+appender.API_LOGFILE.strategy.max = 20
+appender.API_LOGFILE.filter.threshold.type = ThresholdFilter
+appender.API_LOGFILE.filter.threshold.level = DEBUG
+
 # Appender config to send Atomikos transaction logs to new log file tm.out.
 appender.ATOMIKOS_LOGFILE.type = RollingFile
 appender.ATOMIKOS_LOGFILE.name = ATOMIKOS_LOGFILE
-appender.ATOMIKOS_LOGFILE.fileName = {{ logs_location }}/repository/logs/tm.out
-appender.ATOMIKOS_LOGFILE.filePattern = {{ logs_location }}/repository/logs/tm-%d{MM-dd-yyyy}.out
+appender.ATOMIKOS_LOGFILE.fileName = {{ logs_location }}/tm.out
+appender.ATOMIKOS_LOGFILE.filePattern = {{ logs_location }}/tm-%d{MM-dd-yyyy}.out
 appender.ATOMIKOS_LOGFILE.layout.type = PatternLayout
 appender.ATOMIKOS_LOGFILE.layout.pattern = {% raw %}[%d] [%tenantId] %5p {%c} - %m%ex%n
 {% endraw %}
@@ -65,11 +84,44 @@ appender.ATOMIKOS_LOGFILE.policies.time.modulate = true
 appender.ATOMIKOS_LOGFILE.strategy.type = DefaultRolloverStrategy
 appender.ATOMIKOS_LOGFILE.strategy.max = 20
 
+appender.WIRE_LOG.type = RollingFile
+appender.WIRE_LOG.name = WIRE_LOG
+appender.WIRE_LOG.fileName = {{ logs_location }}/wire.log
+appender.WIRE_LOG.filePattern = {{ logs_location }}/wire-%d{dd-MM-yyyy}.log
+appender.WIRE_LOG.layout.type = PatternLayout
+appender.WIRE_LOG.layout.pattern = {% raw %}%d] [%tenantId] %5p {%c} - %m%ex%n
+{% endraw %}
+appender.WIRE_LOG.policies.type = Policies
+appender.WIRE_LOG.policies.time.type = TimeBasedTriggeringPolicy
+appender.WIRE_LOG.policies.time.interval = 1
+appender.WIRE_LOG.policies.time.modulate = true
+appender.WIRE_LOG.strategy.type = DefaultRolloverStrategy
+appender.WIRE_LOG.strategy.max = 14
+appender.WIRE_LOG.filter.threshold.type = ThresholdFilter
+appender.WIRE_LOG.filter.threshold.level = DEBUG
+
+appender.HTTP_ACCESS.type = RollingFile
+appender.HTTP_ACCESS.name = HTTP_ACCESS
+appender.HTTP_ACCESS.fileName = {{ logs_location }}/http_access.log
+appender.HTTP_ACCESS.filePattern = {{ logs_location }}/http_access-%d{MM-dd-yyyy}.log
+appender.HTTP_ACCESS.layout.type = PatternLayout
+appender.HTTP_ACCESS.layout.pattern = [%X{Correlation-ID}] %mm%n
+appender.HTTP_ACCESS.policies.type = Policies
+appender.HTTP_ACCESS.policies.time.type = TimeBasedTriggeringPolicy
+appender.HTTP_ACCESS.policies.time.interval = 1
+appender.HTTP_ACCESS.policies.time.modulate = true
+appender.HTTP_ACCESS.policies.size.type = SizeBasedTriggeringPolicy
+appender.HTTP_ACCESS.policies.size.size=10MB
+appender.HTTP_ACCESS.strategy.type = DefaultRolloverStrategy
+appender.HTTP_ACCESS.strategy.max = 20
+appender.HTTP_ACCESS.filter.threshold.type = ThresholdFilter
+appender.HTTP_ACCESS.filter.threshold.level = INFO
+
 # Appender config to CARBON_TRACE_LOGFILE
 appender.CARBON_TRACE_LOGFILE.type = RollingFile
 appender.CARBON_TRACE_LOGFILE.name = CARBON_TRACE_LOGFILE
-appender.CARBON_TRACE_LOGFILE.fileName = {{ logs_location }}/repository/logs/wso2carbon-trace-messages.log
-appender.CARBON_TRACE_LOGFILE.filePattern = {{ logs_location }}/repository/logs/wso2carbon-trace-messages-%d{MM-dd-yyyy}.log
+appender.CARBON_TRACE_LOGFILE.fileName = {{ logs_location }}/wso2carbon-trace-messages.log
+appender.CARBON_TRACE_LOGFILE.filePattern = {{ logs_location }}/wso2carbon-trace-messages-%d{MM-dd-yyyy}.log
 appender.CARBON_TRACE_LOGFILE.layout.type = PatternLayout
 appender.CARBON_TRACE_LOGFILE.layout.pattern = {% raw %}[%d] [%tenantId] %5p {%c} - %m%ex%n
 {% endraw %}
@@ -86,8 +138,8 @@ appender.CARBON_TRACE_LOGFILE.strategy.max = 20
 # Appender config to put correlation Log.
 appender.CORRELATION.type = RollingFile
 appender.CORRELATION.name = CORRELATION
-appender.CORRELATION.fileName ={{ logs_location }}/repository/logs/correlation.log
-appender.CORRELATION.filePattern ={{ logs_location }}/repository/logs/correlation-%d{MM-dd-yyyy}-%i.log.gz
+appender.CORRELATION.fileName ={{ logs_location }}/correlation.log
+appender.CORRELATION.filePattern ={{ logs_location }}/correlation-%d{MM-dd-yyyy}-%i.log.gz
 appender.CORRELATION.layout.type = PatternLayout
 appender.CORRELATION.layout.pattern = {% raw %}%d{yyyy-MM-dd HH:mm:ss,SSS}|%X{Correlation-ID}|%t|%m%n
 {% endraw %}
@@ -105,8 +157,8 @@ appender.CORRELATION.filter.threshold.level = INFO
 
 appender.ERROR_LOGFILE.type = RollingFile
 appender.ERROR_LOGFILE.name = ERROR_LOGFILE
-appender.ERROR_LOGFILE.fileName ={{ logs_location }}/repository/logs/wso2-apigw-errors.log
-appender.ERROR_LOGFILE.filePattern ={{ logs_location }}/repository/logs/wso2-apigw-errors-%d{MM-dd-yyyy}-%i.log.gz
+appender.ERROR_LOGFILE.fileName ={{ logs_location }}/wso2-apigw-errors.log
+appender.ERROR_LOGFILE.filePattern ={{ logs_location }}/wso2-apigw-errors-%d{MM-dd-yyyy}-%i.log.gz
 appender.ERROR_LOGFILE.layout.type = PatternLayout
 appender.ERROR_LOGFILE.layout.pattern = {% raw %}%d{ISO8601} [%X{ip}-%X{host}] [%t] %5p %c{1} %m%n
 {% endraw %}
@@ -134,8 +186,8 @@ appender.CARBON_SYS_LOG.filter.threshold.level = DEBUG
 
 appender.OPEN_TRACING.type = RollingFile
 appender.OPEN_TRACING.name = OPEN_TRACING
-appender.OPEN_TRACING.fileName ={{ logs_location }}/repository/logs/wso2-apimgt-open-tracing.log
-appender.OPEN_TRACING.filePattern ={{ logs_location }}/repository/logs/wso2-apimgt-open-tracing-%d{MM-dd-yyyy}-%i.log.gz
+appender.OPEN_TRACING.fileName ={{ logs_location }}/wso2-apimgt-open-tracing.log
+appender.OPEN_TRACING.filePattern ={{ logs_location }}/wso2-apimgt-open-tracing-%d{MM-dd-yyyy}-%i.log.gz
 appender.OPEN_TRACING.layout.type = PatternLayout
 appender.OPEN_TRACING.layout.pattern = {% raw %}%d{HH:mm:ss,SSS} [%X{ip}-%X{host}] [%t] %5p %m%nn
 {% endraw %}
@@ -153,8 +205,8 @@ appender.OPEN_TRACING.filter.threshold.level = TRACE
 
 appender.TRACE_APPENDER.type = RollingFile
 appender.TRACE_APPENDER.name = TRACE_APPENDER
-appender.TRACE_APPENDER.fileName = {{ logs_location }}/repository/logs/wso2-apigw-trace.log
-appender.TRACE_APPENDER.filePattern = {{ logs_location }}/repository/logs/wso2-apigw-trace-%d{MM-dd-yyyy}.log
+appender.TRACE_APPENDER.fileName = {{ logs_location }}/wso2-apigw-trace.log
+appender.TRACE_APPENDER.filePattern = {{ logs_location }}/wso2-apigw-trace-%d{MM-dd-yyyy}.log
 appender.TRACE_APPENDER.layout.type = PatternLayout
 appender.TRACE_APPENDER.layout.pattern = {% raw %}%d{HH:mm:ss,SSS} [%X{ip}-%X{host}] [%t] %5p %c{1} %m%n
 {% endraw %}
@@ -167,8 +219,8 @@ appender.TRACE_APPENDER.strategy.max = 20
 
 appender.SERVICE_APPENDER.type = RollingFile
 appender.SERVICE_APPENDER.name = SERVICE_APPENDER
-appender.SERVICE_APPENDER.fileName = {{ logs_location }}/repository/logs/wso2-apigw-service.log
-appender.SERVICE_APPENDER.filePattern = {{ logs_location }}/repository/logs/wso2-apigw-service-%i.log
+appender.SERVICE_APPENDER.fileName = {{ logs_location }}/wso2-apigw-service.log
+appender.SERVICE_APPENDER.filePattern = {{ logs_location }}/wso2-apigw-service-%i.log
 appender.SERVICE_APPENDER.layout.type = PatternLayout
 appender.SERVICE_APPENDER.layout.pattern = {% raw %}%d{ISO8601} [%X{ip}-%X{host}] [%t] %5p %c{1} %m%n
 {% endraw %}
@@ -178,15 +230,49 @@ appender.SERVICE_APPENDER.policies.size.size=1000KB
 appender.SERVICE_APPENDER.strategy.type = DefaultRolloverStrategy
 appender.SERVICE_APPENDER.strategy.max = 10
 
+appender.APIM_METRICS_APPENDER.type = RollingFile
+appender.APIM_METRICS_APPENDER.name = APIM_METRICS_APPENDER
+appender.APIM_METRICS_APPENDER.fileName = {{ logs_location }}/apim_metrics.log
+appender.APIM_METRICS_APPENDER.filePattern = {{ logs_location }}/apim_metrics-%d{MM-dd-yyyy}-%i.log
+appender.APIM_METRICS_APPENDER.layout.type = PatternLayout
+appender.APIM_METRICS_APPENDER.layout.pattern = {% raw %}%d{HH:mm:ss,SSS} [%X{ip}-%X{host}] [%t] %5p %c{1} %m%n
+{% endraw %}
+appender.APIM_METRICS_APPENDER.policies.type = Policies
+appender.APIM_METRICS_APPENDER.policies.time.type = TimeBasedTriggeringPolicy
+appender.APIM_METRICS_APPENDER.policies.time.interval = 1
+appender.APIM_METRICS_APPENDER.policies.time.modulate = true
+appender.APIM_METRICS_APPENDER.policies.size.type = SizeBasedTriggeringPolicy
+appender.APIM_METRICS_APPENDER.policies.size.size=1000MB
+appender.APIM_METRICS_APPENDER.strategy.type = DefaultRolloverStrategy
+appender.APIM_METRICS_APPENDER.strategy.max = 10
+
 
 appender.osgi.type = PaxOsgi
 appender.osgi.name = PaxOsgi
 appender.osgi.filter = *
 
-loggers = AUDIT_LOG, trace-messages, org-apache-coyote, com-hazelcast, Owasp-CsrfGuard, org-apache-axis2-wsdl-codegen-writer-PrettyPrinter, org-apache-axis2-clustering, org-apache-catalina, org-apache-tomcat, org-wso2-carbon-apacheds, org-apache-directory-server-ldap, org-apache-directory-server-core-event, com-atomikos, org-quartz, org-apache-jackrabbit-webdav, org-apache-juddi, org-apache-commons-digester-Digester, org-apache-jasper-compiler-TldLocationsCache, org-apache-qpid, org-apache-qpid-server-Main, qpid-message, qpid-message-broker-listening, org-apache-tiles, org-apache-commons-httpclient, org-apache-solr, me-prettyprint-cassandra-hector-TimingLogger, org-apache-axis-enterprise, org-apache-directory-shared-ldap, org-apache-directory-server-ldap-handlers, org-apache-directory-shared-ldap-entry-DefaultServerAttribute, org-apache-directory-server-core-DefaultDirectoryService, org-apache-directory-shared-ldap-ldif-LdifReader, org-apache-directory-server-ldap-LdapProtocolHandler, org-apache-directory-server-core, org-apache-directory-server-ldap-LdapSession, DataNucleus, Datastore, Datastore-Schema, JPOX-Datastore, JPOX-Plugin, JPOX-MetaData, JPOX-Query, JPOX-General, JPOX-Enhancer, org-apache-hadoop-hive, hive, ExecMapper, ExecReducer, net-sf-ehcache-config-ConfigurationFactory, axis2Deployment, equinox, tomcat2, StAXDialectDetector, trace, synapse, synapse_transport, axis2, axis2_transport, org-wso2-carbon, hunsicker, thrift-publisher, service_logger, trace_logger, org-wso2-carbon-apimgt-gateway-mediators-BotDetectionMediator, wso2-callhome, correlation, JAGGERY_LOG, user-core-logger
+loggers = AUDIT_LOG, HTTP_ACCESS, reporter, apache-post-logger, client-http-wire, synapse-transport-http-wire, trace-messages, org-apache-coyote, com-hazelcast, Owasp-CsrfGuard, org-apache-axis2-wsdl-codegen-writer-PrettyPrinter, org-apache-axis2-clustering, org-apache-catalina, org-apache-tomcat, org-wso2-carbon-apacheds, org-apache-directory-server-ldap, org-apache-directory-server-core-event, com-atomikos, org-quartz, org-apache-jackrabbit-webdav, org-apache-juddi, org-apache-commons-digester-Digester, org-apache-jasper-compiler-TldLocationsCache, org-apache-qpid, org-apache-qpid-server-Main, qpid-message, qpid-message-broker-listening, org-apache-tiles, org-apache-commons-httpclient, org-apache-solr, me-prettyprint-cassandra-hector-TimingLogger, org-apache-axis-enterprise, org-apache-directory-shared-ldap, org-apache-directory-server-ldap-handlers, org-apache-directory-shared-ldap-entry-DefaultServerAttribute, org-apache-directory-server-core-DefaultDirectoryService, org-apache-directory-shared-ldap-ldif-LdifReader, org-apache-directory-server-ldap-LdapProtocolHandler, org-apache-directory-server-core, org-apache-directory-server-ldap-LdapSession, DataNucleus, Datastore, Datastore-Schema, JPOX-Datastore, JPOX-Plugin, JPOX-MetaData, JPOX-Query, JPOX-General, JPOX-Enhancer, org-apache-hadoop-hive, hive, ExecMapper, ExecReducer, net-sf-ehcache-config-ConfigurationFactory, axis2Deployment, equinox, tomcat2, StAXDialectDetector, trace, synapse, synapse_transport, axis2, axis2_transport, org-wso2-carbon, hunsicker, thrift-publisher, service_logger, trace_logger, org-wso2-carbon-apimgt-gateway-mediators-BotDetectionMediator, wso2-callhome, correlation, JAGGERY_LOG
+
+#, http-wire, synapse-wire
+
+logger.apache-post-logger.name=org.wso2.carbon.identity.mgt.endpoint.util.client
+logger.apache-post-logger.level=INFO
+
+logger.reporter.name = org.wso2.am.analytics.publisher.reporter.elk
+logger.reporter.level = INFO
+logger.reporter.additivity = false
+logger.reporter.appenderRef.APIM_METRICS_APPENDER.ref = APIM_METRICS_APPENDER
 
 logger.user-core-logger.name = org.wso2.carbon.user.core
-logger.user-core-logger.level = DEBUG
+logger.user-core-logger.level = INFO
+
+logger.HTTP_ACCESS.name = HTTP_ACCESS
+logger.HTTP_ACCESS.level = INFO
+logger.HTTP_ACCESS.appenderRef.HTTP_ACCESS.ref = HTTP_ACCESS
+logger.HTTP_ACCESS.additivity = false
+
+logger.http-wire.name = org.apache.http.wire
+logger.http-wire.level = DEBUG
 
 logger.JAGGERY_LOG.name = JAGGERY
 logger.JAGGERY_LOG.level = INFO
@@ -195,6 +281,16 @@ logger.AUDIT_LOG.name = AUDIT_LOG
 logger.AUDIT_LOG.level = INFO
 logger.AUDIT_LOG.appenderRef.AUDIT_LOGFILE.ref = AUDIT_LOGFILE
 logger.AUDIT_LOG.additivity = false
+
+logger.client-http-wire.name = org.apache.http.wire
+logger.client-http-wire.level = DEBUG
+logger.client-http-wire.appenderRef.WIRE_LOG.ref = WIRE_LOG
+logger.client-http-wire.additivity = false
+
+logger.synapse-transport-http-wire.name=org.apache.synapse.transport.http.wire
+logger.synapse-transport-http-wire.level=DEBUG
+logger.synapse-transport-http-wire.appenderRef.WIRE_LOG.ref = WIRE_LOG
+logger.synapse-transport-http-wire.additivity = false
 
 logger.trace-messages.name = trace.messages
 logger.trace-messages.level = TRACE
@@ -221,6 +317,7 @@ logger.org-apache.name = org.apache
 logger.org-apache.level = INFO
 logger.org-apache.additivity = false
 logger.org-apache.appenderRef.CARBON_LOGFILE.ref = CARBON_LOGFILE
+logger.org-apache.appenderRef.CARBON_CONSOLE.ref = CARBON_CONSOLE
 
 logger.org-apache-catalina.name = org.apache.catalina
 logger.org-apache-catalina.level = ERROR
@@ -384,6 +481,9 @@ logger.tomcat2.level = FATAL
 logger.StAXDialectDetector.name = org.apache.axiom.util.stax.dialect.StAXDialectDetector
 logger.StAXDialectDetector.level = ERROR
 
+#logger.apimgt.name = org.wso2.carbon.apimgt
+#logger.apimgt.level = DEBUG
+
 
 logger.trace.name = trace
 logger.trace.level = TRACE
@@ -428,6 +528,8 @@ logger.trace_logger.level = INFO
 logger.trace_logger.appenderRef.TRACE_APPENDER.ref = TRACE_APPENDER
 
 
+
+
 # root loggers
 rootLogger.level = ERROR
 rootLogger.appenderRef.CARBON_CONSOLE.ref = CARBON_CONSOLE
@@ -439,8 +541,8 @@ rootLogger.appenderRef.PaxOsgi.ref = PaxOsgi
 # bot detection feature appender
 appender.BOTDATA_APPENDER.type=RollingFile
 appender.BOTDATA_APPENDER.name=BOTDATA_APPENDER
-appender.BOTDATA_APPENDER.fileName={{ logs_location }}/repository/logs/wso2-BotDetectedData.log
-appender.BOTDATA_APPENDER.filePattern={{ logs_location }}/repository/logs/wso2-BotDetectedData-%d{MM-dd-yyyy}.log
+appender.BOTDATA_APPENDER.fileName={{ logs_location }}/wso2-BotDetectedData.log
+appender.BOTDATA_APPENDER.filePattern={{ logs_location }}/wso2-BotDetectedData-%d{MM-dd-yyyy}.log
 appender.BOTDATA_APPENDER.layout.type=PatternLayout
 appender.BOTDATA_APPENDER.layout.pattern = {% raw %}[%d] [%tenantId] %5p {%c} - %m%ex%n
 {% endraw %}
