@@ -23,6 +23,10 @@ docker rm $WSO2AM_NAME-gateway
 docker network rm $WSO2AM_DOMAIN
 docker network create $WSO2AM_DOMAIN --subnet=$WSO2AM_IP_PRE.0.0/16
 
+unzip ./ansible-apim/files/packs/wso2am-4.3.0.zip "wso2am-4.3.0/dbscripts/*" -d ansible-apim/files/dbscripts/
+mv ansible-apim/files/dbscripts/wso2am-4.3.0/dbscripts/* ansible-apim/files/dbscripts/
+rm -r ansible-apim/files/dbscripts/wso2am-4.3.0
+
 docker run -p 3306:3306 --name $WSO2AM_NAME-db --network $WSO2AM_DOMAIN --ip $WSO2AM_IP_PRE.0.10 -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0
 sleep 10
 docker exec $WSO2AM_NAME-db rmdir dbscripts --ignore-fail-on-non-empty

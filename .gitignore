@@ -27,6 +27,8 @@ hs_err_pid*
 ansible-apim/files/jdk/
 ansible-apim/files/packs/
 ansible-apim/files/security/
+ansible-apim/files/dbscripts/
+
 logs/
 pwds/
 
