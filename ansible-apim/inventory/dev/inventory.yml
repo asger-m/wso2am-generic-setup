@@ -1,8 +1,15 @@
-apim-control-plane:
+apim-all-in-one:
   hosts:
     apim01:
       ansible_host: "{{ lookup('env', 'WSO2AM_NAME') }}-apim01.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
     apim02:
+      ansible_host: "{{ lookup('env', 'WSO2AM_NAME') }}-apim02.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
+
+apim-control-plane:
+  hosts:
+    xapim01:
+      ansible_host: "{{ lookup('env', 'WSO2AM_NAME') }}-apim01.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
+    xapim02:
       ansible_host: "{{ lookup('env', 'WSO2AM_NAME') }}-apim02.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
 
 apim-gateway:

@@ -27,7 +27,7 @@
     - apim01
     - apim02
   roles:
-    - apim-control-plane
+    - apim-all-in-one
 
 - name: Apply API Manager default configuration to an apim-gateway node
   hosts:

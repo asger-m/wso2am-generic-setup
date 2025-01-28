@@ -113,7 +113,7 @@ allow_headers = ["authorization","Access-Control-Allow-Origin","Content-Type","S
 allow_credentials = false
 
 [transport.https.properties]
-server="RegionH API Server"
+server="API Server"
 {% if gw_https_proxy_port is defined %}
 proxyPort = {{ gw_https_proxy_port }}
 {% endif %}
