@@ -23,9 +23,9 @@ docker rm $WSO2AM_NAME-gateway
 docker network rm $WSO2AM_DOMAIN
 docker network create $WSO2AM_DOMAIN --subnet=$WSO2AM_IP_PRE.0.0/16
 
-unzip ./ansible-apim/files/packs/wso2am-4.3.0.zip "wso2am-4.3.0/dbscripts/*" -d ansible-apim/files/dbscripts/
-mv ansible-apim/files/dbscripts/wso2am-4.3.0/dbscripts/* ansible-apim/files/dbscripts/
-rm -r ansible-apim/files/dbscripts/wso2am-4.3.0
+unzip ./ansible-apim/files/packs/wso2am-4.4.0.zip "wso2am-4.4.0/dbscripts/*" -d ansible-apim/files/dbscripts/
+mv ansible-apim/files/dbscripts/wso2am-4.4.0/dbscripts/* ansible-apim/files/dbscripts/
+rm -r ansible-apim/files/dbscripts/wso2am-4.4.0
 
 docker run -p 3306:3306 --name $WSO2AM_NAME-db --network $WSO2AM_DOMAIN --ip $WSO2AM_IP_PRE.0.10 -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0
 sleep 10
@@ -114,3 +114,13 @@ sshpass -p root ssh root@$WSO2AM_NAME-apim01.$WSO2AM_DOMAIN -o StrictHostKeyChec
 sshpass -p root ssh root@$WSO2AM_NAME-apim02.$WSO2AM_DOMAIN -o StrictHostKeyChecking=accept-new -t 'exit'
 sshpass -p root ssh root@$WSO2AM_NAME-gateway01.$WSO2AM_DOMAIN -o StrictHostKeyChecking=accept-new -t 'exit'
 sshpass -p root ssh root@$WSO2AM_NAME-gateway02.$WSO2AM_DOMAIN -o StrictHostKeyChecking=accept-new -t 'exit'
+
+unzip -j ./ansible-apim/files/packs/wso2am-4.4.0.zip "wso2am-4.4.0/repository/deployment/server/webapps/admin/site/public/conf/settings.json" -d "ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/admin/"
+unzip -j ./ansible-apim/files/packs/wso2am-4.4.0.zip "wso2am-4.4.0/repository/deployment/server/webapps/devportal/site/public/theme/settings.json" -d "ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/devportal/"
+unzip -j ./ansible-apim/files/packs/wso2am-4.4.0.zip "wso2am-4.4.0/repository/deployment/server/webapps/publisher/site/public/conf/settings.json" -d "ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/publisher/"
+sed -i 's/localhost/{{ local_hostname }}/g' ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/admin/settings.json
+sed -i 's/localhost/{{ local_hostname }}/g' ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/devportal/settings.json
+sed -i 's/localhost/{{ local_hostname }}/g' ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/publisher/settings.json
+mv ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/admin/settings.json ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/admin/settings.json.j2
+mv ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/devportal/settings.json ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/devportal/settings.json.j2
+mv ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/publisher/settings.json ansible-apim/roles/apim-all-in-one/templates/carbon-home/repository/webapps/publisher/settings.json.j2

@@ -8,7 +8,7 @@ admin_password: admin
 wso2_group: wso2 # OS group to be created
 wso2_user: wso2carbon # OS user for WSO2 services
 product_name: wso2am
-product_version: 4.3.0
+product_version: 4.4.0
 target: /data # Product installation directory
 
 logs_location: /data/logs # Product installation directory
