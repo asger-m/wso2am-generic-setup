@@ -26,7 +26,7 @@ db_server: "{{ lookup('env', 'WSO2AM_NAME') }}-db"
 db_params: autoReconnect=true&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=Europe/Copenhagen
 
 hostname: "{{ lookup('env', 'WSO2AM_NAME') }}-apim.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
-domainname: "apim.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
+domainname: "{{ lookup('env', 'WSO2AM_DOMAIN') }}"
 control_lb: "{{ lookup('env', 'WSO2AM_NAME') }}-apim.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
 gateway_lb: "{{ lookup('env', 'WSO2AM_NAME') }}-gateway.{{ lookup('env', 'WSO2AM_DOMAIN') }}"
 

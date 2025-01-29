@@ -105,12 +105,12 @@ auth_header = "Authorization"
 enable_token_encryption = false
 enable_token_hashing = false
 
-[apim.cors]
-allow_origins = "https://{{ control_lb }}"
-allow_methods = ["GET","PUT","POST","DELETE","PATCH","OPTIONS"]
-allow_headers = ["authorization","Access-Control-Allow-Origin","Content-Type","SOAPAction","apikey","Internal-Key"]
+#[apim.cors]
+#allow_origins = "*"
+#allow_methods = ["GET","PUT","POST","DELETE","PATCH","OPTIONS"]
+#allow_headers = ["authorization","Access-Control-Allow-Origin","Content-Type","SOAPAction","apikey","Internal-Key"]
 #allow_headers = ["authorization","Access-Control-Allow-Origin","Content-Type","SOAPAction"]
-allow_credentials = false
+#allow_credentials = false
 
 [transport.https.properties]
 server="API Server"
